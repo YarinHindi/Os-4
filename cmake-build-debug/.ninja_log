@@ -1,0 +1,5 @@
+# ninja log v5
+0	231	6715973249446337	CMakeFiles/Os_4.dir/main.cpp.obj	bc3a68f821517149
+229	311	6715976810645658	Os_4.exe	5783dd9346e5a1be
+2	229	6715976809753709	CMakeFiles/Os_4.dir/stack.cpp.obj	627c7f71e1aebd7b
+2	229	6715974809166600	CMakeFiles/Os_4.dir/Node.cpp.obj	c6cc65092a34f163
