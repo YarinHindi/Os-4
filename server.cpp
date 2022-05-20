@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include "heap.c"
 #define MAX_LENGTH 1024
-#define PORT "3492"  // the port users will be connecting to
+#define PORT "3493"  // the port users will be connecting to
 #define BACKLOG 10   // how many pending connections queue will hold
 Stack *myStack ;
 Queue *myQueue ;

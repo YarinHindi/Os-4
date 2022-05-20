@@ -10,6 +10,7 @@
  * buddy of the other. When a node is freed, the node and its buddy can be
  * merged again if the buddy is also free. This makes the memory available
  * for larger allocations again.
+ * --- WE TOOK THIS CODE FROM STACK-OVER-FLOW ---
  */
 
 #include <memory.h>

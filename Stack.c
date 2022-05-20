@@ -1,7 +1,7 @@
 #include "Node.c"
 #include <strings.h>
 #include <stdio.h>
-#include "heap.c"
+#include "binaryAllocator.c"
 
 #define MAX_LENGTH 1024
 typedef struct Stack {

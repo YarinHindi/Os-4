@@ -2,81 +2,66 @@
 // Created by orian on 28/04/2022.
 //
 #include <stdio.h>
-#include<stdlib.h>
-
 #include <unistd.h>
-#define MAX 1024
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
-
-#define READ 0
-#define WRITE 1
-
-pid_t popen2(const char *command, int *infp, int *outfp)
-{
-    int p_stdin[2], p_stdout[2];
-    pid_t pid;
-
-    if (pipe(p_stdin) != 0 || pipe(p_stdout) != 0)
-        return -1;
-
-    pid = fork();
-    if (pid < 0)
-        return pid;
-    else if (pid == 0)
-    {
-        close(p_stdin[WRITE]);
-        dup2(p_stdin[READ], READ);
-        close(p_stdout[READ]);
-        dup2(p_stdout[WRITE], WRITE);
-        char * const * param ={"Orian"};
-        execvp("./client", param);
+#include <string.h>
+char * golb = "a";
+void write_to_client(char to_do){
+    int des_p[2];
+    char buffer[6];
+    if(pipe(des_p)) {
+        perror("Pipe failed");
         exit(1);
     }
-
-    if (infp == NULL)
-        close(p_stdin[WRITE]);
-    else
-        *infp = p_stdin[WRITE];
-    if (outfp == NULL)
-        close(p_stdout[READ]);
-    else
-        *outfp = p_stdout[READ];
-    return pid;
-}
-
-/*
-* now in main... infp will be the stdin (in file descriptor)
-* and outfp will be the stdout (out file descriptor)
-* have fun
-*/
-
-int main(int argc, char **argv)
-{
-    int infp, outfp;
-    char buf[128];
-
-    if (popen2("your-program-B", &infp, &outfp) <= 0)
-    {
-        printf("Unable to exec your-program-B\n");
+    char * args[] = {"./client","Yarin",NULL};
+    int pid=fork();
+    if(pid==0){
+        close(STDIN_FILENO);  //closing stdout
+        close(des_p[1]); //close cause parent will write to this end of pipe
+        dup2(des_p[0],0);//replacing Stdin with pipe read so when parnt will write it will show on stdin
+        close(des_p[0]);       //closing pipe read
+        execvp("./client",args);
         exit(1);
-    }
+    }else {
+        memset(buffer, '0', 6);
+        close(des_p[0]);
+        char * command  = "PUSH HELLO\n";
 
-    memset (buf, 0x0, sizeof(buf));
-
-    write(infp, "Z\n", 2);
-    write(infp, "D\n", 2);
-    write(infp, "A\n", 2);
-    write(infp, "C\n", 2);
-    close(infp);
-    read(outfp, buf, 128);
-    printf("buf = '%s'\n", buf);
-    return 0;
+        if (to_do == 'w'){
+            write(des_p[1], "PUSH HELLO\n", 11);
+            write(des_p[1], "TOP\n", 4);
+        }else{
+            write(des_p[1],"POP\n",4);
+            write(des_p[1], "TOP\n", 4);
+        }
+        sleep(1);
+        close(des_p[1]);
+        wait(NULL);
+    };
 }
 
+int main(int argc, char **argv) {
+    int pid = fork();
+    if (pid == 0) {
+        write_to_client('w');
+        exit(1);
+    } else {
+        int pid2 = fork();
+        if (pid2 == 0) {
+            write_to_client('w');
+            exit(1);
+        } else {
+            int pid3 = fork();
+            if (pid3 == 0) {
+                write_to_client('r');
+                exit(1);
+            } else {
+                wait(NULL);
+            }
+        }
+    }
+}
 
 
